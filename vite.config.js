@@ -8,7 +8,7 @@ export default defineConfig({
             '@': path.resolve(__dirname, './src')
         }
     },
-    base: '/vue-shop/',
+    base: './',
     server: {
         port: 3000,
         open: true
