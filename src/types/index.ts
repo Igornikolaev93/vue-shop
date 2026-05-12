@@ -17,7 +17,6 @@ export interface Product {
     title: string
     code: string
   }>
-  // Добавьте эти поля позже, если они появятся в других ответах API
   description?: string
   category?: string
   rating?: {
@@ -25,7 +24,6 @@ export interface Product {
     count: number
   }
 }
-
 
 export interface CartItem extends Product {
   quantity: number
@@ -37,16 +35,3 @@ export interface ApiError {
 }
 
 export type LoadingStatus = 'idle' | 'loading' | 'success' | 'error'
-
-export interface Category {
-  name: string
-  slug: string
-}
-
-export interface Order {
-  id: string
-  items: CartItem[]
-  total: number
-  date: Date
-  status: 'pending' | 'processing' | 'completed' | 'cancelled'
-}

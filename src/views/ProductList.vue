@@ -44,7 +44,7 @@ import { useCart } from '@/composables/useCart'
 import ProductCard from '@/components/ProductCard.vue'
 import type { Product } from '@/types'
 
-const { products, loading, error, fetchProducts, searchQuery, filteredProducts } = useProducts()
+const { loading, error, fetchProducts, searchQuery, filteredProducts } = useProducts()
 const { addToCart } = useCart()
 
 const handleAddToCart = (product: Product) => {
@@ -54,7 +54,6 @@ const handleAddToCart = (product: Product) => {
 
 <style scoped>
 .product-list {
-  
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -65,11 +64,10 @@ const handleAddToCart = (product: Product) => {
 
 .search-input {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem;
   border: 2px solid #e0e0e0;
   border-radius: 8px;
   font-size: 1rem;
-  transition: border-color 0.2s;
 }
 
 .search-input:focus {
@@ -105,7 +103,6 @@ const handleAddToCart = (product: Product) => {
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  margin-top: 1rem;
 }
 
 .products-grid {
@@ -118,11 +115,5 @@ const handleAddToCart = (product: Product) => {
   text-align: center;
   padding: 3rem;
   color: #666;
-}
-
-@media (max-width: 768px) {
-  .products-grid {
-    gap: 1rem;
-  }
 }
 </style>

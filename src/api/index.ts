@@ -1,4 +1,4 @@
-import type { ApiError, ApiResponse } from '@/types'
+import type { ApiError } from '@/types'
 
 const BASE_URL = 'https://vue-study.skillbox.cc/api'
 
@@ -9,7 +9,7 @@ class ApiClient {
   ): Promise<T> {
     const url = `${BASE_URL}${endpoint}`
     
-    console.log('API Request:', url) // Для отладки
+    console.log('API Request:', url)
     
     try {
       const response = await fetch(url, {
@@ -29,7 +29,6 @@ class ApiClient {
       }
       
       const data = await response.json()
-      console.log('API Response:', data) // Для отладки
       return data as T
     } catch (error) {
       console.error('API Error:', error)

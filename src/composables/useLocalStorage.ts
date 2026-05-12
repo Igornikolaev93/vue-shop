@@ -8,7 +8,7 @@ export function useLocalStorage<T>(key: string, defaultValue: T): {
   const storedValue = localStorage.getItem(key)
   const data = ref<T>(
     storedValue ? JSON.parse(storedValue) : defaultValue
-  )
+  ) as Ref<T>
   
   const save = () => {
     localStorage.setItem(key, JSON.stringify(data.value))

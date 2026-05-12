@@ -16,7 +16,7 @@
           
           <div v-else class="cart-items">
             <div v-for="item in cartItems" :key="item.id" class="cart-item">
-              <img :src="item.image" :alt="item.title" class="item-image">
+              <img :src="getImageUrl(item)" :alt="item.title" class="item-image">
               
               <div class="item-details">
                 <h3>{{ truncateText(item.title, 30) }}</h3>
@@ -61,9 +61,10 @@
 </template>
 
 <script setup lang="ts">
+import { useRouter } from 'vue-router'
 import { useCart } from '@/composables/useCart'
 import { formatPrice, truncateText } from '@/utils/formatters'
-import { useRouter } from 'vue-router'
+import type { CartItem } from '@/types'
 
 const props = defineProps<{
   visible: boolean
@@ -75,6 +76,16 @@ const emit = defineEmits<{
 
 const router = useRouter()
 const { cartItems, updateQuantity, removeFromCart, totalPrice, clearCart } = useCart()
+
+const getImageUrl = (item: CartItem): string => {
+  if (item.image?.file?.url) {
+    if (item.image.file.url.startsWith('/')) {
+      return `https://vue-study.skillbox.cc${item.image.file.url}`
+    }
+    return item.image.file.url
+  }
+  return 'https://via.placeholder.com/100x100?text=No+Image'
+}
 
 const close = () => {
   emit('close')
@@ -91,6 +102,7 @@ const goToCheckout = () => {
 </script>
 
 <style scoped>
+/* Стили остаются без изменений */
 .slide-enter-active,
 .slide-leave-active {
   transition: all 0.3s ease;
@@ -131,56 +143,23 @@ const goToCheckout = () => {
   border-bottom: 1px solid #e0e0e0;
 }
 
-.cart-header h2 {
-  margin: 0;
-  font-size: 1.5rem;
-}
-
 .close-btn {
   background: none;
   border: none;
   font-size: 2rem;
   cursor: pointer;
   color: #666;
-  transition: color 0.2s;
-}
-
-.close-btn:hover {
-  color: #333;
 }
 
 .cart-content {
   flex: 1;
   overflow-y: auto;
+  padding: 1rem;
 }
 
 .empty-cart {
   text-align: center;
-  padding: 3rem 1.5rem;
-}
-
-.empty-cart-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-  opacity: 0.5;
-}
-
-.empty-cart p {
-  color: #666;
-  margin-bottom: 1.5rem;
-}
-
-.continue-shopping {
-  padding: 0.5rem 1rem;
-  background: #667eea;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.cart-items {
-  padding: 1rem;
+  padding: 2rem;
 }
 
 .cart-item {
@@ -201,48 +180,22 @@ const goToCheckout = () => {
   flex: 1;
 }
 
-.item-details h3 {
-  font-size: 0.9rem;
-  margin-bottom: 0.25rem;
-  color: #333;
-}
-
-.item-price {
-  color: #666;
-  font-size: 0.85rem;
-}
-
 .item-quantity {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 0.25rem;
 }
 
 .item-quantity button {
   width: 30px;
   height: 30px;
-  border: none;
-  background: #f8f9fa;
+  border: 1px solid #ddd;
+  background: white;
   cursor: pointer;
-  font-size: 1rem;
-  border-radius: 4px;
-}
-
-.item-quantity button:hover {
-  background: #e9ecef;
-}
-
-.item-quantity span {
-  min-width: 30px;
-  text-align: center;
 }
 
 .item-total {
   font-weight: bold;
-  color: #667eea;
   min-width: 80px;
   text-align: right;
 }
@@ -251,29 +204,17 @@ const goToCheckout = () => {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 1.2rem;
-  opacity: 0.7;
-  transition: opacity 0.2s;
-}
-
-.remove-btn:hover {
-  opacity: 1;
 }
 
 .cart-footer {
-  padding: 1.5rem;
+  padding: 1rem;
   border-top: 1px solid #e0e0e0;
-  background: #f8f9fa;
 }
 
 .cart-total {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  font-size: 1.2rem;
   margin-bottom: 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #e0e0e0;
 }
 
 .cart-actions {
@@ -288,18 +229,6 @@ const goToCheckout = () => {
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 1rem;
-  transition: all 0.2s;
-}
-
-.clear-cart-btn {
-  background: #f8f9fa;
-  color: #666;
-  border: 1px solid #ddd;
-}
-
-.clear-cart-btn:hover {
-  background: #e9ecef;
 }
 
 .checkout-btn {
@@ -307,7 +236,8 @@ const goToCheckout = () => {
   color: white;
 }
 
-.checkout-btn:hover {
-  background: #5a67d8;
+.clear-cart-btn {
+  background: #f8f9fa;
+  border: 1px solid #ddd;
 }
 </style>

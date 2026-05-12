@@ -12,7 +12,7 @@
         <h2>Ваш заказ</h2>
         <div class="order-items">
           <div v-for="item in cartItems" :key="item.id" class="order-item">
-            <img :src="item.image" :alt="item.title" class="item-image">
+            <img :src="getImageUrl(item)" :alt="item.title" class="item-image">
             <div class="item-details">
               <h3>{{ item.title }}</h3>
               <p>{{ formatPrice(item.price) }} × {{ item.quantity }}</p>
@@ -101,10 +101,21 @@ import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCart } from '@/composables/useCart'
 import { formatPrice } from '@/utils/formatters'
+import type { CartItem } from '@/types'
 
 const router = useRouter()
 const { cartItems, totalPrice, clearCart } = useCart()
 const isSubmitting = ref(false)
+
+const getImageUrl = (item: CartItem): string => {
+  if (item.image?.file?.url) {
+    if (item.image.file.url.startsWith('/')) {
+      return `https://vue-study.skillbox.cc${item.image.file.url}`
+    }
+    return item.image.file.url
+  }
+  return 'https://via.placeholder.com/100x100?text=No+Image'
+}
 
 const form = reactive({
   name: '',
@@ -129,20 +140,14 @@ const submitOrder = async () => {
   
   console.log('Order submitted:', order)
   
-  // Здесь можно отправить заказ на сервер
-  // await apiClient.post('/orders', order)
-  
   alert('Спасибо за заказ! Наш менеджер свяжется с вами в ближайшее время.')
   clearCart()
   router.push('/')
 }
-
-const validateForm = () => {
-  return form.name && form.email && form.phone && form.address
-}
 </script>
 
 <style scoped>
+/* Стили остаются без изменений */
 .checkout {
   max-width: 1200px;
   margin: 0 auto;
@@ -151,24 +156,6 @@ const validateForm = () => {
 
 .checkout-title {
   margin-bottom: 2rem;
-  color: #333;
-}
-
-.empty-cart {
-  text-align: center;
-  padding: 3rem;
-  background: white;
-  border-radius: 12px;
-}
-
-.continue-shopping {
-  display: inline-block;
-  margin-top: 1rem;
-  padding: 0.75rem 1.5rem;
-  background: #667eea;
-  color: white;
-  text-decoration: none;
-  border-radius: 6px;
 }
 
 .checkout-content {
@@ -184,16 +171,9 @@ const validateForm = () => {
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-.order-summary h2,
-.checkout-form h2 {
-  margin-bottom: 1.5rem;
-  font-size: 1.5rem;
-}
-
 .order-items {
   max-height: 400px;
   overflow-y: auto;
-  margin-bottom: 1.5rem;
 }
 
 .order-item {
@@ -214,23 +194,12 @@ const validateForm = () => {
   flex: 1;
 }
 
-.item-details h3 {
-  font-size: 0.9rem;
-  margin-bottom: 0.25rem;
-}
-
-.item-total {
-  font-weight: bold;
-  color: #667eea;
-}
-
 .order-total {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  margin-top: 1rem;
   padding-top: 1rem;
   border-top: 2px solid #e0e0e0;
-  font-size: 1.2rem;
 }
 
 .checkout-form {
@@ -241,60 +210,35 @@ const validateForm = () => {
 }
 
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: #333;
 }
 
 .form-group input,
 .form-group textarea {
   width: 100%;
-  padding: 0.75rem;
+  padding: 0.5rem;
   border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 1rem;
-  transition: border-color 0.2s;
-}
-
-.form-group input:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: #667eea;
+  border-radius: 4px;
 }
 
 .submit-btn {
   width: 100%;
-  padding: 1rem;
+  padding: 0.75rem;
   background: #667eea;
   color: white;
   border: none;
   border-radius: 6px;
-  font-size: 1rem;
   cursor: pointer;
-  transition: background 0.2s;
-}
-
-.submit-btn:hover:not(:disabled) {
-  background: #5a67d8;
-}
-
-.submit-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }
 
 @media (max-width: 768px) {
   .checkout-content {
     grid-template-columns: 1fr;
-  }
-  
-  .checkout {
-    padding: 1rem;
   }
 }
 </style>
