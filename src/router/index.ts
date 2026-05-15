@@ -1,6 +1,10 @@
+// src/router/index.ts
 import { createRouter, createWebHistory } from 'vue-router'
 import ProductList from '@/views/ProductList.vue'
 import CartPage from '@/views/CartPage.vue'
+import AccountPage from '@/views/AccountPage.vue'
+import OrdersPage from '@/views/OrdersPage.vue'
+import { authService } from '@/api/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,17 +31,31 @@ const router = createRouter({
       component: () => import('@/views/Checkout.vue')
     },
     {
+      path: '/account',
+      name: 'account',
+      component: AccountPage,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/orders',
+      name: 'orders',
+      component: OrdersPage,
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
       component: () => import('@/views/NotFound.vue')
     }
-  ],
-  scrollBehavior(_to, _from, savedPosition) {
-    if (savedPosition) {
-      return savedPosition
-    } else {
-      return { top: 0 }
-    }
+  ]
+})
+
+// Защита маршрутов
+router.beforeEach((to, _from, next) => {
+  if (to.meta.requiresAuth && !authService.isAuthenticated()) {
+    next('/')
+  } else {
+    next()
   }
 })
 

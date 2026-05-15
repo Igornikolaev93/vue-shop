@@ -1,3 +1,4 @@
+// src/api/products.ts
 import { apiClient } from './index'
 import type { Product } from '@/types'
 
@@ -16,11 +17,9 @@ export const productsApi = {
   // Получение товара по ID
   getById: async (id: number): Promise<Product | null> => {
     try {
-      // Пробуем получить напрямую
       const product = await apiClient.get<Product>(`/products/${id}`)
       return product
     } catch (error) {
-      // Если напрямую не получается, ищем в списке всех товаров
       const products = await productsApi.getAll()
       const foundProduct = products.find(p => p.id === id)
       return foundProduct || null
@@ -33,18 +32,12 @@ export const productsApi = {
     return products.slice(0, limit)
   },
   
-  // Поиск товаров по цене (пример дополнительного метода)
-  getByPriceRange: async (min: number, max: number): Promise<Product[]> => {
-    const products = await productsApi.getAll()
-    return products.filter(p => p.price >= min && p.price <= max)
-  },
-  
   // Получение уникальных цветов из всех товаров
   getAllColors: async (): Promise<string[]> => {
     const products = await productsApi.getAll()
     const colors = new Set<string>()
     products.forEach(product => {
-      product.colors.forEach(color => {
+      product.colors.forEach((color: { id: number; title: string; code: string }) => {
         colors.add(color.title)
       })
     })

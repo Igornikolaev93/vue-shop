@@ -1,3 +1,4 @@
+// src/types/index.ts
 export interface Product {
   id: number
   title: string
@@ -35,3 +36,50 @@ export interface ApiError {
 }
 
 export type LoadingStatus = 'idle' | 'loading' | 'success' | 'error'
+
+export interface User {
+  id: number
+  email: string
+  name: string
+  phone?: string
+  avatar?: string
+  orders?: Order[]
+  createdAt: string
+}
+
+export interface LoginCredentials {
+  email: string
+  password: string
+}
+
+export interface RegisterData {
+  name: string
+  email: string
+  password: string
+  phone?: string
+}
+
+export interface AuthResponse {
+  user: User
+  token: string
+}
+
+export interface Order {
+  id: string
+  items: CartItem[]
+  total: number
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
+  createdAt: string
+  shippingAddress: {
+    name: string
+    email: string
+    phone: string
+    address: string
+    comment?: string
+  }
+}
+
+export interface Category {
+  name: string
+  slug: string
+}

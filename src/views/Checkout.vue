@@ -100,11 +100,14 @@
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCart } from '@/composables/useCart'
+import { useAuth } from '@/composables/useAuth'
 import { formatPrice } from '@/utils/formatters'
-import type { CartItem } from '@/types'
+import { authService } from '@/api/auth'
+import type { CartItem, Order } from '@/types'
 
 const router = useRouter()
 const { cartItems, totalPrice, clearCart } = useCart()
+const { user } = useAuth()
 const isSubmitting = ref(false)
 
 const getImageUrl = (item: CartItem): string => {
@@ -118,9 +121,9 @@ const getImageUrl = (item: CartItem): string => {
 }
 
 const form = reactive({
-  name: '',
-  email: '',
-  phone: '',
+  name: user.value?.name || '',
+  email: user.value?.email || '',
+  phone: user.value?.phone || '',
   address: '',
   comment: ''
 })
@@ -131,23 +134,31 @@ const submitOrder = async () => {
   // Симуляция отправки заказа
   await new Promise(resolve => setTimeout(resolve, 1500))
   
-  const order = {
-    ...form,
+  const newOrder: Order = {
+    id: Date.now().toString(),
     items: cartItems.value,
     total: totalPrice.value,
-    date: new Date().toISOString()
+    status: 'pending',
+    createdAt: new Date().toISOString(),
+    shippingAddress: {
+      name: form.name,
+      email: form.email,
+      phone: form.phone,
+      address: form.address,
+      comment: form.comment
+    }
   }
   
-  console.log('Order submitted:', order)
+  // Сохраняем заказ в профиле пользователя
+  authService.saveOrder(newOrder)
   
-  alert('Спасибо за заказ! Наш менеджер свяжется с вами в ближайшее время.')
+  alert('Спасибо за заказ! Наш менеджер свяжется с вами.')
   clearCart()
-  router.push('/')
+  router.push('/orders')
 }
 </script>
 
 <style scoped>
-/* Стили остаются без изменений */
 .checkout {
   max-width: 1200px;
   margin: 0 auto;
@@ -156,6 +167,24 @@ const submitOrder = async () => {
 
 .checkout-title {
   margin-bottom: 2rem;
+  color: #333;
+}
+
+.empty-cart {
+  text-align: center;
+  padding: 3rem;
+  background: white;
+  border-radius: 12px;
+}
+
+.continue-shopping {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: #667eea;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
 }
 
 .checkout-content {
@@ -171,9 +200,16 @@ const submitOrder = async () => {
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
+.order-summary h2,
+.checkout-form h2 {
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
 .order-items {
   max-height: 400px;
   overflow-y: auto;
+  margin-bottom: 1rem;
 }
 
 .order-item {
@@ -194,12 +230,23 @@ const submitOrder = async () => {
   flex: 1;
 }
 
+.item-details h3 {
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.item-total {
+  font-weight: bold;
+  color: #667eea;
+}
+
 .order-total {
   display: flex;
   justify-content: space-between;
-  margin-top: 1rem;
+  align-items: center;
   padding-top: 1rem;
   border-top: 2px solid #e0e0e0;
+  font-size: 1.2rem;
 }
 
 .checkout-form {
@@ -210,35 +257,60 @@ const submitOrder = async () => {
 }
 
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #333;
 }
 
 .form-group input,
 .form-group textarea {
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.75rem;
   border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #667eea;
 }
 
 .submit-btn {
   width: 100%;
-  padding: 0.75rem;
+  padding: 1rem;
   background: #667eea;
   color: white;
   border: none;
   border-radius: 6px;
+  font-size: 1rem;
   cursor: pointer;
+  transition: background 0.2s;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: #5a67d8;
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 @media (max-width: 768px) {
   .checkout-content {
     grid-template-columns: 1fr;
+  }
+  
+  .checkout {
+    padding: 1rem;
   }
 }
 </style>

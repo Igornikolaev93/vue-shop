@@ -1,3 +1,4 @@
+// src/api/index.ts
 import type { ApiError } from '@/types'
 
 const BASE_URL = 'https://vue-study.skillbox.cc/api'
@@ -8,8 +9,6 @@ class ApiClient {
     options?: RequestInit
   ): Promise<T> {
     const url = `${BASE_URL}${endpoint}`
-    
-    console.log('API Request:', url)
     
     try {
       const response = await fetch(url, {
